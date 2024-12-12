@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  origin:
+    image: nginx:latest
+    container_name: origin_server
+    volumes:
+      - ./origin-server/website:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80" # Origin server
+
+  l2_cache:
+    image: nginx:latest
+    container_name: l2_cache_server
+    volumes:
+      - ./l2-cache/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - origin
+    ports:
+      - "8081:80" # L2 Cache
+
+  l1_cache:
+    image: nginx:latest
+    container_name: l1_cache_server
+    volumes:
+      - ./l1-cache/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - l2_cache
+    ports:
+      - "80:80" # L1 Cache
+
